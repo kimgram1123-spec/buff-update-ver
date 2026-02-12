@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>쿠키런 버프/디버프 뽑기</title>
+    <style>
+        body { background-color: #1a1a1a; color: white; text-align: center; font-family: 'Malgun Gothic', sans-serif; }
+        #container { margin-top: 50px; }
+        #card-display { 
+            width: 350px; height: 500px; 
+            border: 10px solid #444; border-radius: 20px; 
+            margin: 20px auto; background: #222;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: all 0.5s; overflow: hidden; position: relative;
+        }
+        img { width: 90%; height: auto; border-radius: 10px; margin-bottom: 15px; }
+        .info { padding: 10px; }
+        .grade { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
+        .name { font-size: 1.2rem; color: #ffd700; margin-bottom: 10px; }
+        .effect { font-size: 1rem; color: #ccc; line-height: 1.4; padding: 0 15px; }
+        
+        button { 
+            padding: 15px 40px; font-size: 1.2rem; cursor: pointer; 
+            background: #e74c3c; color: white; border: none; border-radius: 5px;
+            transition: 0.3s;
+        }
+        button:hover { background: #c0392b; }
+
+        /* 특수 등급 연출 */
+        .royal-legend { border-color: #f1c40f !important; box-shadow: 0 0 30px #f1c40f; animation: glow 1s infinite alternate; }
+        .hell { border-color: #9b59b6 !important; box-shadow: 0 0 30px #e74c3c; animation: shake 0.1s infinite; }
+        
+        @keyframes glow { from { box-shadow: 0 0 20px #f1c40f; } to { box-shadow: 0 0 40px #fff; } }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -2px); } 100% { transform: translate(1px, 1px); } }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <h1>쿠키런 챌린지 룰렛</h1>
+    <div id="card-display">
+        <div class="info">카드를 뽑아주세요!</div>
+    </div>
+    <button onclick="pickCard()">카드 뽑기</button>
+</div>
+
+<script>
+const cards = [
+    { id: 1, grade: "레전드", name: "매화의 축복", effect: "선달로 매화단청 쿠키를 확정으로 씁니다.", weight: 2.0 },
+    { id: 2, grade: "레전드", name: "점수가 더블!", effect: "이번 판 총 점수가 두 배 증폭합니다.", weight: 2.0 },
+    { id: 3, grade: "에픽", name: "약한 친구들도 모이면 강해지지!", effect: "C~A 등급 쿠키/ 펫이 나올 때마다 리롤을 두 개 추가합니다.", weight: 3.35 },
+    { id: 4, grade: "에픽", name: "어떤 펫이 나올까?", effect: "자신이 원하는 펫을 선택할 수 있고, 리롤을 세 개 추가 획득합니다.", weight: 3.35 },
+    { id: 5, grade: "에픽", name: "이제 우리에게 맡겨!", effect: "불꽃정령 쿠키, 망개떡맛 쿠키, 충무김밥맛 쿠키 중 하나를 이어달리기에서 달릴 수 있습니다.", weight: 3.35 },
+    { id: 6, grade: "에픽", name: "물질 만능 주의", effect: "이번 판에 획득한 코인의 삼천 배를 점수로 획득합니다.", weight: 3.35 },
+    { id: 7, grade: "레어", name: "가볍게 툭!", effect: "리롤 7 개를 추가로 얻습니다.", weight: 3.0 },
+    { id: 8, grade: "레어", name: "경험이 많은 자", effect: "이번 판에 획득한 경험치의 육천 배를 점수로 획득합니다.", weight: 3.0 },
+    { id: 9, grade: "레어", name: "향긋한 풀내음", effect: "초록색 계열 쿠키들을 고른다면 이번 판의 점수가 1.5배 증폭됩니다.", weight: 3.0 },
+    { id: 10, grade: "레어", name: "쫄?", effect: "이번 판에 보물로 통조림 세 개를 끼면 다음 판의 점수가 1.3배 증폭됩니다.", weight: 3.0 },
+    { id: 11, grade: "레어", name: "인생은 도박", effect: "리롤 다섯 번 안에 레전더리 쿠키가 나오면 펫과 이어달리기를 자유 선택 할 수 있지만, 실패하면 선달이 슈크림맛 쿠키로 고정됩니다.", weight: 3.0 },
+    { id: 12, grade: "레어", name: "구름을 타는 기분", effect: "이번 판에 보너스타임을 들어간 만큼 이천만 점이 추가됩니다.", weight: 3.0 },
+    { id: 13, grade: "고통", name: "웃음벨맛 쿠키", effect: "이번 판에 이어달리기가 예언자맛 쿠키로 고정됩니다.", weight: 3.22 },
+    { id: 14, grade: "고통", name: "백성을 위한 의적", effect: "마지막 판에 보물을 크라운, 꼬치, 돌도그를 제외하고 플레이합니다.", weight: 3.22 },
+    { id: 15, grade: "고통", name: "뱀파이어맛 쿠키의 야식 시간", effect: "이번 판에 보물을 인삼주, 홍삼주, 떡꼬치, 크레페 중에서만 골라야 합니다.", weight: 3.22 },
+    { id: 16, grade: "고통", name: "물약펫 표류기", effect: "이번 판에 물약펫이 나오면 강제 리롤을 합니다.", weight: 3.22 },
+    { id: 17, grade: "고통", name: "레전드의 절망", effect: "이번 판에 레전더리 쿠키/펫을 선택 시 리롤이 열 개 차감됩니다.", weight: 3.22 },
+    { id: 18, grade: "고통", name: "인생은 매콤하게!", effect: "이번 판에 무조건 네 대를 충돌해야 합니다.", weight: 3.22 },
+    { id: 19, grade: "고통", name: "뉴비는 빠져!", effect: "2024~2026년에 출시된 쿠키/ 펫이 나오면 강제 리롤합니다. 단, 리롤 세 개를 차감하면 디버프를 해제합니다.", weight: 3.22 },
+    { id: 20, grade: "고통", name: "해적의 약탈", effect: "리롤 다섯 개를 차감합니다.", weight: 3.22 },
+    { id: 21, grade: "죽음", name: "교통사고", effect: "이어달리기를 사용하지 못합니다.", weight: 1.0 },
+    { id: 22, grade: "죽음", name: "먼저 퇴근합니다!", effect: "모든 보유효과와 보물을 해제한 상태로 달립니다.", weight: 1.0 },
+    { id: 23, grade: "로얄 레전드", name: "달과 바다의 조화", effect: "조합 자유 선택, 점수 1.5배 증폭.", weight: 0.5 },
+    { id: 24, grade: "지옥", name: "폴터가이스트", effect: "목표 점수 1.5배 증폭, 현재 쿠키 리롤의 1/10 강탈.", weight: 1.5 },
+    { id: 25, grade: "레어", name: "쟤가 없어져볼게!", effect: "C~B 등급 쿠키/펫이 나오면 리롤을 무료로 돌릴 수 있습니다.", weight: 3.0 },
+    { id: 26, grade: "고통", name: "밑 빠진 독에 빠진 저울", effect: "펫이 코인저울로 고정됩니다.", weight: 3.22 },
+    { id: 27, grade: "에픽", name: "도플갱어", effect: "쿠키 리롤,버프 리롤 두 개씩 추가, 이번 판을 리트라이 할 수 있습니다.", weight: 3.35 },
+    { id: 28, grade: "레어", name: "천사의 은총", effect: "게임이 끝나고 스페셜 에피소드3을 천사맛/천사의 별/ 요정맛 쿠키로 한 번 더 달릴 수 있습니다.", weight: 3.0 },
+    { id: 29, grade: "고통", name: "세금 징수", effect: "현재 총 점수의 10%를 깎습니다.", weight: 3.22 },
+    { id: 30, grade: "레어", name: "해적의 인질 협상", effect: "목표 점수를 1억 추가하는 대신 버프 이미지에 있는 쿠키를 이어달리기로 집을 수 있습니다.", weight: 3.0 },
+    { id: 31, grade: "고통", name: "아픈 건 딱 질색이니까", effect: "버프 이미지에 있는 보물만 선택할 수 있습니다.", weight: 3.22 },
+    { id: 32, grade: "에픽", name: "멋진 한 판이었어!", effect: "순점 2.5억 넘으면 리롤 7개, 버프 리롤 3개, 점수 50만 추가.", weight: 3.35 },
+    { id: 33, grade: "레어", name: "산타의 작은 선물", effect: "5212만 점을 추가로 얻습니다.", weight: 3.0 },
+    { id: 34, grade: "고통", name: "발렌타인데이", effect: "펫, 보물이 버프 이미지에 있는 걸로 고정됩니다. (선택 가능)", weight: 3.22 },
+    { id: 35, grade: "레전드", name: "상큼한 점수 폭발!", effect: "3억점이 즉시 추가됩니다.", weight: 2.0 },
+    { id: 36, grade: "죽음", name: "타락 천사", effect: "효과가 두 개 이상 있는 보물 착용 금지", weight: 1.0 }
+];
+
+function pickCard() {
+    const display = document.getElementById('card-display');
+    display.className = ""; // 효과 초기화
+    
+    // 확률 계산
+    let totalWeight = cards.reduce((sum, card) => sum + card.weight, 0);
+    let random = Math.random() * totalWeight;
+    let selected = null;
+
+    for (let card of cards) {
+        if (random < card.weight) {
+            selected = card;
+            break;
+        }
+        random -= card.weight;
+    }
+
+    // 화면 갱신
+    if (selected.grade === "로얄 레전드") display.classList.add("royal-legend");
+    if (selected.grade === "지옥") display.classList.add("hell");
+
+    display.innerHTML = `
+        <div class="grade" style="color:${getGradeColor(selected.grade)}">[${selected.grade}]</div>
+        <img src="${selected.id}.png.png" alt="Card Image" onerror="this.src='https://via.placeholder.com/200x200?text=Image+Missing'">
+        <div class="name">${selected.name}</div>
+        <div class="effect">${selected.effect}</div>
+    `;
+}
+
+function getGradeColor(grade) {
+    switch(grade) {
+        case "로얄 레전드": return "#f1c40f";
+        case "지옥": return "#9b59b6";
+        case "레전드": return "#ff9f43";
+        case "에픽": return "#a29bfe";
+        case "레어": return "#74b9ff";
+        case "고통": return "#fab1a0";
+        case "죽음": return "#ff7675";
+        default: return "white";
+    }
+}
+</script>
+
+</body>
+</html>
