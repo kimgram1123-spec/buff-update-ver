@@ -6,31 +6,39 @@
     <style>
         body { background-color: #1a1a1a; color: white; text-align: center; font-family: 'Malgun Gothic', sans-serif; }
         #container { margin-top: 50px; }
+        
+        /* 기본 카드 베이스 */
         #card-display { 
-            width: 350px; height: 500px; 
-            border: 10px solid #444; border-radius: 20px; 
+            width: 350px; height: 530px; 
+            border: 8px solid #444; border-radius: 20px; 
             margin: 20px auto; background: #222;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: all 0.5s; overflow: hidden; position: relative;
+            transition: all 0.4s ease-in-out; overflow: hidden; position: relative;
         }
-        img { width: 90%; height: auto; border-radius: 10px; margin-bottom: 15px; }
-        .info { padding: 10px; }
+
+        /* --- 등급별 테두리 스타일 --- */
+        .border-royal-legend { border-color: #f1c40f !important; box-shadow: 0 0 30px #f1c40f; animation: glow 1s infinite alternate; }
+        .border-legend { border-image: linear-gradient(45deg, #2ecc71, #3498db, #9b59b6) 1; border-width: 10px !important; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+        .border-epic { border-color: #a29bfe !important; box-shadow: 0 0 15px #a29bfe; }
+        .border-rare { border-color: #74b9ff !important; box-shadow: 0 0 10px #74b9ff; }
+        .border-pain { border-color: #95a5a6 !important; }
+        .border-death { border-image: linear-gradient(to right, #7f8c8d, #e74c3c) 1; border-width: 10px !important; }
+        .border-hell { border-color: #e74c3c !important; box-shadow: 0 0 30px #ff0000; animation: shake 0.1s infinite; }
+
+        img { width: 85%; height: auto; border-radius: 10px; margin-bottom: 15px; border: 2px solid rgba(255,255,255,0.1); }
         .grade { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
-        .name { font-size: 1.2rem; color: #ffd700; margin-bottom: 10px; }
-        .effect { font-size: 1rem; color: #ccc; line-height: 1.4; padding: 0 15px; }
+        .name { font-size: 1.2rem; color: #ffd700; margin-bottom: 10px; font-weight: bold; }
+        .effect { font-size: 1rem; color: #ccc; line-height: 1.4; padding: 0 20px; word-break: keep-all; }
         
         button { 
-            padding: 15px 40px; font-size: 1.2rem; cursor: pointer; 
-            background: #e74c3c; color: white; border: none; border-radius: 5px;
-            transition: 0.3s;
+            padding: 15px 45px; font-size: 1.2rem; cursor: pointer; 
+            background: #e74c3c; color: white; border: none; border-radius: 50px;
+            transition: 0.3s; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        button:hover { background: #c0392b; }
+        button:hover { background: #c0392b; transform: scale(1.05); }
 
-        /* 특수 등급 연출 */
-        .royal-legend { border-color: #f1c40f !important; box-shadow: 0 0 30px #f1c40f; animation: glow 1s infinite alternate; }
-        .hell { border-color: #9b59b6 !important; box-shadow: 0 0 30px #e74c3c; animation: shake 0.1s infinite; }
-        
-        @keyframes glow { from { box-shadow: 0 0 20px #f1c40f; } to { box-shadow: 0 0 40px #fff; } }
+        /* 애니메이션 효과 */
+        @keyframes glow { from { box-shadow: 0 0 20px #f1c40f; } to { box-shadow: 0 0 45px #fff; } }
         @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -2px); } 100% { transform: translate(1px, 1px); } }
     </style>
 </head>
@@ -39,8 +47,9 @@
 <div id="container">
     <h1>쿠키런 챌린지 룰렛</h1>
     <div id="card-display">
-        <div class="info">카드를 뽑아주세요!</div>
+        <div class="info">카드를 뽑아보세요!</div>
     </div>
+    <br>
     <button onclick="pickCard()">카드 뽑기</button>
 </div>
 
@@ -51,7 +60,7 @@ const cards = [
     { id: 3, grade: "에픽", name: "약한 친구들도 모이면 강해지지!", effect: "C~A 등급 쿠키/ 펫이 나올 때마다 리롤을 두 개 추가합니다.", weight: 3.35 },
     { id: 4, grade: "에픽", name: "어떤 펫이 나올까?", effect: "자신이 원하는 펫을 선택할 수 있고, 리롤을 세 개 추가 획득합니다.", weight: 3.35 },
     { id: 5, grade: "에픽", name: "이제 우리에게 맡겨!", effect: "불꽃정령 쿠키, 망개떡맛 쿠키, 충무김밥맛 쿠키 중 하나를 이어달리기에서 달릴 수 있습니다.", weight: 3.35 },
-    { id: 6, grade: "에픽", name: "물질 만능 주의", effect: "이번 판에 획득한 코인의 삼천 배를 점수로 획득합니다.", weight: 3.35 },
+    { id: 6, grade: "에픽", name: "물질 만능 주의", effect: "이번 판에 획득한 코인의 사천 배를 점수로 획득합니다.", weight: 3.35 },
     { id: 7, grade: "레어", name: "가볍게 툭!", effect: "리롤 7 개를 추가로 얻습니다.", weight: 3.0 },
     { id: 8, grade: "레어", name: "경험이 많은 자", effect: "이번 판에 획득한 경험치의 육천 배를 점수로 획득합니다.", weight: 3.0 },
     { id: 9, grade: "레어", name: "향긋한 풀내음", effect: "초록색 계열 쿠키들을 고른다면 이번 판의 점수가 1.5배 증폭됩니다.", weight: 3.0 },
@@ -77,18 +86,18 @@ const cards = [
     { id: 29, grade: "고통", name: "세금 징수", effect: "현재 총 점수의 10%를 깎습니다.", weight: 3.22 },
     { id: 30, grade: "레어", name: "해적의 인질 협상", effect: "목표 점수를 1억 추가하는 대신 버프 이미지에 있는 쿠키를 이어달리기로 집을 수 있습니다.", weight: 3.0 },
     { id: 31, grade: "고통", name: "아픈 건 딱 질색이니까", effect: "버프 이미지에 있는 보물만 선택할 수 있습니다.", weight: 3.22 },
-    { id: 32, grade: "에픽", name: "멋진 한 판이었어!", effect: "순점 2.5억 넘으면 리롤 7개, 버프 리롤 3개, 점수 50만 추가.", weight: 3.35 },
+    { id: 32, grade: "에픽", name: "멋진 한 판이었어!", effect: "이억 오천만 점 돌파 시 리롤 7/3개 및 오천만 점 추가.", weight: 3.35 },
     { id: 33, grade: "레어", name: "산타의 작은 선물", effect: "5212만 점을 추가로 얻습니다.", weight: 3.0 },
-    { id: 34, grade: "고통", name: "발렌타인데이", effect: "펫, 보물이 버프 이미지에 있는 걸로 고정됩니다. (선택 가능)", weight: 3.22 },
+    { id: 34, grade: "고통", name: "발렌타인데이", effect: "펫, 보물이 이미지 상의 것으로 고정됩니다. (선택 가능)", weight: 3.22 },
     { id: 35, grade: "레전드", name: "상큼한 점수 폭발!", effect: "3억점이 즉시 추가됩니다.", weight: 2.0 },
     { id: 36, grade: "죽음", name: "타락 천사", effect: "효과가 두 개 이상 있는 보물 착용 금지", weight: 1.0 }
 ];
 
 function pickCard() {
     const display = document.getElementById('card-display');
-    display.className = ""; // 효과 초기화
+    // 모든 특수 테두리 클래스 제거
+    display.className = ""; 
     
-    // 확률 계산
     let totalWeight = cards.reduce((sum, card) => sum + card.weight, 0);
     let random = Math.random() * totalWeight;
     let selected = null;
@@ -101,13 +110,22 @@ function pickCard() {
         random -= card.weight;
     }
 
-    // 화면 갱신
-    if (selected.grade === "로얄 레전드") display.classList.add("royal-legend");
-    if (selected.grade === "지옥") display.classList.add("hell");
+    // 등급별 클래스 부여
+    const gradeClassMap = {
+        "로얄 레전드": "border-royal-legend",
+        "레전드": "border-legend",
+        "에픽": "border-epic",
+        "레어": "border-rare",
+        "고통": "border-pain",
+        "죽음": "border-death",
+        "지옥": "border-hell"
+    };
+    
+    display.classList.add(gradeClassMap[selected.grade]);
 
     display.innerHTML = `
         <div class="grade" style="color:${getGradeColor(selected.grade)}">[${selected.grade}]</div>
-        <img src="${selected.id}.png.png" alt="Card Image" onerror="this.src='https://via.placeholder.com/200x200?text=Image+Missing'">
+        <img src="${selected.id}.png.png" alt="Card" onerror="this.src='https://via.placeholder.com/200x200?text=Image+Missing'">
         <div class="name">${selected.name}</div>
         <div class="effect">${selected.effect}</div>
     `;
@@ -116,11 +134,11 @@ function pickCard() {
 function getGradeColor(grade) {
     switch(grade) {
         case "로얄 레전드": return "#f1c40f";
-        case "지옥": return "#9b59b6";
-        case "레전드": return "#ff9f43";
+        case "지옥": return "#e74c3c";
+        case "레전드": return "#2ecc71";
         case "에픽": return "#a29bfe";
         case "레어": return "#74b9ff";
-        case "고통": return "#fab1a0";
+        case "고통": return "#95a5a6";
         case "죽음": return "#ff7675";
         default: return "white";
     }
