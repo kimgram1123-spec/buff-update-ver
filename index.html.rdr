@@ -6,42 +6,27 @@
     <style>
         body { background-color: #1a1a1a; color: white; text-align: center; font-family: 'Malgun Gothic', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         
-        /* --- 시작 화면 (표지) 스타일 --- */
+        /* --- 시작 화면 (표지) --- */
         #start-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('찐표지.jpg'); 
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
+            background-image: url(찐표지.jpg); 
+            background-repeat: no-repeat; background-position: center center; background-size: cover;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-            z-index: 1000; 
-            transition: opacity 0.5s ease-out;
+            z-index: 1000; transition: opacity 0.5s ease-out;
         }
-
         #start-btn {
             margin-bottom: 100px; padding: 20px 60px; font-size: 1.8rem;
             background: #f1c40f; color: #000; border: none; border-radius: 50px;
             cursor: pointer; font-weight: bold; box-shadow: 0 0 25px rgba(241, 196, 15, 0.8);
-            transition: 0.3s;
         }
-        #start-btn:hover { transform: scale(1.1); background: #fff; }
 
-        /* --- 메인 뽑기 화면 (처음엔 숨김) --- */
-        #container { 
-            display: none; /* 처음에 숨겨져 있어야 함 */
-            padding-top: 50px; 
-            opacity: 0; transition: opacity 0.5s ease-in;
-        }
-        
+        /* --- 뽑기 화면 --- */
+        #container { display: none; padding-top: 50px; }
         #card-display { 
-            width: 350px; height: 530px; 
-            border: 8px solid #444; border-radius: 20px; 
-            margin: 20px auto; background: #222;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: all 0.4s ease-in-out; overflow: hidden; position: relative;
+            width: 350px; height: 530px; border: 8px solid #444; border-radius: 20px; 
+            margin: 20px auto; background: #222; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; position: relative;
         }
-
-        /* 등급 테두리 효과 */
         .border-royal-legend { border-color: #f1c40f !important; box-shadow: 0 0 30px #f1c40f; animation: glow 1s infinite alternate; }
         .border-legend { border-color: #00FFCA !important; border-width: 10px !important; box-shadow: 0 0 15px rgba(0, 255, 202, 0.5); }
         .border-epic { border-color: #a29bfe !important; box-shadow: 0 0 15px #a29bfe; }
@@ -54,13 +39,7 @@
         .grade { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; }
         .name { font-size: 1.2rem; color: #ffd700; margin-bottom: 10px; font-weight: bold; }
         .effect { font-size: 1rem; color: #ccc; line-height: 1.4; padding: 0 20px; word-break: keep-all; }
-        
-        #draw-btn { 
-            padding: 15px 45px; font-size: 1.2rem; cursor: pointer; 
-            background: #e74c3c; color: white; border: none; border-radius: 50px;
-            transition: 0.3s; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-        #draw-btn:hover { background: #c0392b; transform: scale(1.05); }
+        #draw-btn { padding: 15px 45px; font-size: 1.2rem; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 50px; transition: 0.3s; font-weight: bold; }
 
         @keyframes glow { from { box-shadow: 0 0 20px #f1c40f; } to { box-shadow: 0 0 45px #fff; } }
         @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -2px); } 100% { transform: translate(1px, 1px); } }
@@ -74,29 +53,15 @@
 
 <div id="container">
     <h1>랜덤런 버프 룰렛</h1>
-    <div id="card-display">
-        <div class="info" style="font-size:1.2rem; color:#aaa;">랜덤 버프를 뽑아보세요!</div>
-    </div>
+    <div id="card-display"><div class="info">랜덤 버프를 뽑아보세요!</div></div>
     <br>
     <button id="draw-btn" onclick="pickCard()">버프 뽑기</button>
 </div>
 
 <script>
-// 🚩 화면 전환을 확실하게 해주는 함수
 function startApp() {
-    const startScreen = document.getElementById('start-screen');
-    const mainContainer = document.getElementById('container');
-
-    // 1. 표지를 투명하게 만듦
-    startScreen.style.opacity = '0';
-
-    // 2. 0.5초 뒤에 표지를 완전히 없애고 뽑기 창을 보여줌
-    setTimeout(() => {
-        startScreen.style.display = 'none';
-        mainContainer.style.display = 'block';
-        // 뽑기 창을 스르륵 나타나게 함
-        setTimeout(() => { mainContainer.style.opacity = '1'; }, 50);
-    }, 500);
+    document.getElementById('start-screen').remove(); 
+    document.getElementById('container').style.display = 'block';
 }
 
 const cards = [
@@ -144,20 +109,16 @@ function pickCard() {
     let totalWeight = cards.reduce((sum, card) => sum + card.weight, 0);
     let random = Math.random() * totalWeight;
     let selected = null;
-    for (let card of cards) {
-        if (random < card.weight) { selected = card; break; }
-        random -= card.weight;
-    }
+    for (let card of cards) { if (random < card.weight) { selected = card; break; } random -= card.weight; }
     const gradeClassMap = { "로얄 레전드": "border-royal-legend", "레전드": "border-legend", "에픽": "border-epic", "레어": "border-rare", "고통": "border-pain", "죽음": "border-death", "지옥": "border-hell" };
     display.classList.add(gradeClassMap[selected.grade]);
     display.innerHTML = `
         <div class="grade" style="color:${getGradeColor(selected.grade)}">[${selected.grade}]</div>
-        <img src="${selected.id}.png.png" alt="${selected.name}" onerror="this.onerror=null; this.src='${selected.id}.png';">
+        <img src="${selected.id}.png.png" onerror="this.src='${selected.id}.png';">
         <div class="name">${selected.name}</div>
         <div class="effect">${selected.effect}</div>
     `;
 }
-
 function getGradeColor(grade) {
     const colors = { "로얄 레전드": "#f1c40f", "지옥": "#e74c3c", "레전드": "#00FFCA", "에픽": "#a29bfe", "레어": "#74b9ff", "고통": "#95a5a6", "죽음": "#FFFFFF" };
     return colors[grade] || "white";
