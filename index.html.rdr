@@ -9,25 +9,30 @@
         /* --- 시작 화면 (표지) 스타일 --- */
         #start-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            /* 🚩 파일명을 찐표지.jpg로 변경했습니다 */
-            background-image: url(찐표지.jpg); 
+            background-image: url('찐표지.jpg'); 
             background-repeat: no-repeat;
             background-position: center center;
             background-size: cover;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-            z-index: 1000; transition: opacity 0.5s ease-out;
+            z-index: 1000; 
+            transition: opacity 0.5s ease-out;
         }
 
         #start-btn {
-            margin-bottom: 80px; padding: 20px 60px; font-size: 1.8rem;
+            margin-bottom: 100px; padding: 20px 60px; font-size: 1.8rem;
             background: #f1c40f; color: #000; border: none; border-radius: 50px;
-            cursor: pointer; font-weight: bold; box-shadow: 0 0 20px rgba(241, 196, 15, 0.6);
+            cursor: pointer; font-weight: bold; box-shadow: 0 0 25px rgba(241, 196, 15, 0.8);
             transition: 0.3s;
         }
         #start-btn:hover { transform: scale(1.1); background: #fff; }
 
-        /* --- 뽑기 화면 스타일 --- */
-        #container { margin-top: 50px; display: none; }
+        /* --- 메인 뽑기 화면 (처음엔 숨김) --- */
+        #container { 
+            display: none; /* 처음에 숨겨져 있어야 함 */
+            padding-top: 50px; 
+            opacity: 0; transition: opacity 0.5s ease-in;
+        }
+        
         #card-display { 
             width: 350px; height: 530px; 
             border: 8px solid #444; border-radius: 20px; 
@@ -36,7 +41,7 @@
             transition: all 0.4s ease-in-out; overflow: hidden; position: relative;
         }
 
-        /* 등급 테두리 애니메이션 (기존과 동일) */
+        /* 등급 테두리 효과 */
         .border-royal-legend { border-color: #f1c40f !important; box-shadow: 0 0 30px #f1c40f; animation: glow 1s infinite alternate; }
         .border-legend { border-color: #00FFCA !important; border-width: 10px !important; box-shadow: 0 0 15px rgba(0, 255, 202, 0.5); }
         .border-epic { border-color: #a29bfe !important; box-shadow: 0 0 15px #a29bfe; }
@@ -70,19 +75,27 @@
 <div id="container">
     <h1>랜덤런 버프 룰렛</h1>
     <div id="card-display">
-        <div class="info">랜덤 버프를 뽑아보세요!</div>
+        <div class="info" style="font-size:1.2rem; color:#aaa;">랜덤 버프를 뽑아보세요!</div>
     </div>
     <br>
     <button id="draw-btn" onclick="pickCard()">버프 뽑기</button>
 </div>
 
 <script>
-// 화면 전환 함수
+// 🚩 화면 전환을 확실하게 해주는 함수
 function startApp() {
-    document.getElementById('start-screen').style.opacity = '0';
+    const startScreen = document.getElementById('start-screen');
+    const mainContainer = document.getElementById('container');
+
+    // 1. 표지를 투명하게 만듦
+    startScreen.style.opacity = '0';
+
+    // 2. 0.5초 뒤에 표지를 완전히 없애고 뽑기 창을 보여줌
     setTimeout(() => {
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('container').style.display = 'block';
+        startScreen.style.display = 'none';
+        mainContainer.style.display = 'block';
+        // 뽑기 창을 스르륵 나타나게 함
+        setTimeout(() => { mainContainer.style.opacity = '1'; }, 50);
     }, 500);
 }
 
